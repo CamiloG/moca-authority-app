@@ -25,3 +25,8 @@ proguard/
 
 # Log Files
 *.log
+
+.idea
+AuthorityApp.iml
+app/.directory
+app/app.iml

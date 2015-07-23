@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">AuthorityApp</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_configuration">ConfigurationActivity</string>
+    <string name="title_activity_decrypt">DecryptActivity</string>
+    <string name="welcome_message">AuthorityApp</string>
+    <string name="decrypt_multiplied_ballots">Desencriptar resultado</string>
+    <string name="configure">Configuración</string>
+</resources>
