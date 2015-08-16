@@ -1,5 +1,5 @@
 # AuthorityApp
-Seventh part of the [*MoCa QR*](https://github.com/CamiloG/moca_qr) Voting System project.
+App for the Election Authorities, which is part of the [*MoCa QR*](https://github.com/CamiloG/moca_qr) Voting System project.
 
 Android app for the authorities to store their share of the private key and decrypt the value present on the Bulletin Board server at the end of the election.
 
