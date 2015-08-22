@@ -1,5 +1,5 @@
 # AuthorityApp
-App for the Election Authorities, which is part of the [*MoCa QR*](https://github.com/CamiloG/moca_qr) Voting System project.
+App for the Election Authorities, which is part of the [*MoCa QR*](http://mocaqr.niclabs.cl) Voting System project.
 
 Android app for the authorities to store their share of the private key and decrypt the value present on the Bulletin Board server at the end of the election.
 
@@ -27,7 +27,7 @@ Android app for the authorities to store their share of the private key and decr
 
 ### Configuration of the Private Share
 * Now the authority needs to record her share of the private key on the application, for that select 'Configure Private Share'.
-* Select the location of the private share of the authority (recommended to be on an external storage recorded directly from [AuthKeyGenerator](http://www.github.com/CamiloG/AuthKeyGenerator)).
+* Select the location of the private share of the authority (recommended to be on an external storage recorded directly from [AuthKeyGenerator](http://www.github.com/niclabs/moca-auth-keys-generator)).
 * Now is shown on the main window that the private share is already configured and working.
 
 ### Decrypting Process
