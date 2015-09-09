@@ -83,6 +83,7 @@ public class DecryptActivity extends Activity {
 
     }
 
+    // TODO: Change this to upload a valid value of the share
     private void uploadPartialDecryption(PartialDecryption share) throws IOException {
         // Set the URL where to POST the public key
         URL obj = new URL(partialDecryptionsServer);
@@ -113,47 +114,25 @@ public class DecryptActivity extends Activity {
         share = authPrivateKey.decrypt(new BigInteger(multipliedBallotsString));
 
         return share;
-
-        /*DecryptionZKP share;
-
-        PaillierThreshold authPrivateKey = getAuthorityPrivateKey();
-        BigInteger multipliedBallots = new BigInteger(multipliedBallotsString);
-
-        share = authPrivateKey.decryptProof(multipliedBallots);
-
-        return share;*/
     }
 
     private PaillierThreshold getAuthorityPrivateKey() throws IOException, ClassNotFoundException {
-        PaillierPrivateThresholdKey authPrivateKey = null;
+        PaillierThreshold authPrivateKey = null;
+
+        // TODO: Change this path to the real one
+        String pathToPrivateKey = "privatekey.key";
 
         if (isExternalStorageReadable()) {
 
-            System.out.println("ENTRÉ!");
-            String valueString = "";
-            File valueFile = new File("/storage/sdcard1/", "2_privateKey");
+            BufferedReader privateKeyIn = new BufferedReader(new FileReader("p1File"));
+            String privateKeyRecoveredJson = privateKeyIn.readLine();
 
-            BufferedReader reader = new BufferedReader(new FileReader(valueFile));
-            valueString = reader.readLine();
-
-            // authPrivateKey = new PaillierPrivateThresholdKey(new BigInteger(valueString).toByteArray(), new SecureRandom().nextLong());
-
-            ObjectInputStream oin = new ObjectInputStream(new BufferedInputStream(new FileInputStream(valueFile)));
-            BigInteger[][] values = (BigInteger[][]) oin.readObject();
-
-            BigInteger n = values[0][0];
-            BigInteger l = values[0][1];
-            BigInteger w = values[0][2];
-            BigInteger v = values[0][3];
-            BigInteger si = values[0][4];
-            BigInteger i = values[0][5];
-            BigInteger[] vi = values[1];
-
-            authPrivateKey = new PaillierPrivateThresholdKey(n, l.intValue(), w.intValue(), v, vi, si, i.intValue(), new SecureRandom().nextLong());
+            PrivateKey privateKey = new Gson().fromJson(privateKeyRecoveredJson, PrivateKey.class);
+            authPrivateKey = new PaillierThreshold(new PaillierPrivateThresholdKey(privateKey.n, Integer.parseInt(privateKey.l.toString()), Integer.parseInt(privateKey.w.toString()), privateKey.v, privateKey.vi, privateKey.si, Integer.parseInt(privateKey.i.toString()), new SecureRandom().nextLong()));
 
         }
 
-        return new PaillierThreshold(authPrivateKey);
+        return authPrivateKey;
 
     }
 
