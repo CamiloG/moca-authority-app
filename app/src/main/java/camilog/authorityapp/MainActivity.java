@@ -28,7 +28,13 @@ public class MainActivity extends Activity {
             }
         });
 
-
+        configureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, ConfigurationActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override

@@ -10,9 +10,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.Object;
 
 
 public class ConfigurationActivity extends Activity {
@@ -21,50 +26,63 @@ public class ConfigurationActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_configuration);
-
-        Intent intent = new Intent("com.google.zxing.client.android.SCAN");
-        intent.putExtra("SCAN_MODE", "QR_CODE_MODE");
-        intent.putExtra("SCAN_CAMERA_ID", 0);
-
-        startActivityForResult(intent, 0);
+        Intent intent = new Intent(ConfigurationActivity.this, FileChooserActivity.class);
+        startActivityForResult(intent,1);
     }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent intent) {
-        if (requestCode == 0) {
+    public void onActivityResult(int requestCode, int resultCode, Intent intent){
+        File keyPath;
+        String keyInfo;
+        BufferedReader reader;
+        if (requestCode == 1){
             if (resultCode == RESULT_OK){
-                String authPrivateKeyString = intent.getStringExtra("SCAN_RESULT");
-
-                File authPrivateKeyDir = getApplicationContext().getDir("authPrivateKey", Context.MODE_PRIVATE);
-                File authPrivateKeyFile = new File(authPrivateKeyDir, "authPrivateKey.key");
-
+                keyPath = new File(intent.getStringExtra("keyPath"));
                 try {
-                    if (authPrivateKeyFile.exists())
-                        authPrivateKeyFile.delete();
-
-                    authPrivateKeyFile.createNewFile();
-
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(authPrivateKeyFile, true));
-                    writer.write(authPrivateKeyString);
-                    writer.close();
-
-                    Toast toast = Toast.makeText(this, "Authority Private Key recorded successfully!", Toast.LENGTH_LONG);
-                    toast.setGravity(Gravity.TOP, 25, 400);
-                    toast.show();
-
-                } catch (Exception e) {}
-
-                Intent intent2 = new Intent(ConfigurationActivity.this, MainActivity.class);
-                startActivity(intent2);
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // Handle cancel
-                Toast toast = Toast.makeText(this, "Scan was Cancelled!", Toast.LENGTH_LONG);
-                toast.setGravity(Gravity.TOP, 25, 400);
-                toast.show();
-                finish();
-
+                    keyInfo = readFile(keyPath);
+                    configureAuthKey(keyInfo);
+                } catch (IOException e){
+                    e.printStackTrace();
+                }
             }
         }
+    }
+
+    private String readFile(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader (file));
+        String line;
+
+        try {
+            line = reader.readLine();
+            return line;
+        } finally {
+            reader.close();
+        }
+    }
+
+    private void configureAuthKey(String authPrivateKeyString) {
+        File authPrivateKeyDir = getApplicationContext().getDir("authPrivateKey", Context.MODE_PRIVATE);
+        File authPrivateKeyFile = new File(authPrivateKeyDir, "authPrivateKey.key");
+
+        try {
+            if (authPrivateKeyFile.exists())
+                authPrivateKeyFile.delete();
+
+            authPrivateKeyFile.createNewFile();
+
+            BufferedWriter writer = new BufferedWriter(new FileWriter(authPrivateKeyFile, true));
+            writer.write(authPrivateKeyString);
+            writer.close();
+
+            Toast toast = Toast.makeText(this, "Authority Private Key recorded successfully!", Toast.LENGTH_LONG);
+            toast.setGravity(Gravity.TOP, 25, 400);
+            toast.show();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        Intent intent2 = new Intent(ConfigurationActivity.this, MainActivity.class);
+        startActivity(intent2);
     }
 
     @Override

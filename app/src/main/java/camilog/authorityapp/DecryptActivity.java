@@ -2,10 +2,13 @@ package camilog.authorityapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -33,8 +36,8 @@ import paillierp.zkp.DecryptionZKP;
 
 public class DecryptActivity extends Activity {
 
-    static private final String multBallotsServer ="http://cjgomez.duckdns.org:3000/multiplied_ballots";
-    static private final String partialDecryptionsServer = "http://cjgomez.duckdns.org:3000/partial_decryptions";
+    static private final String multBallotsServer ="http://cjgomez.cl:5984/multiplied_ballots";
+    static private final String partialDecryptionsServer = "http://cjgomez.cl:5984/partial_decryptions";
     static private final int authId = 2;
 
     @Override
@@ -80,10 +83,12 @@ public class DecryptActivity extends Activity {
         PartialDecryption share = decryptMultipliedBallots(multipliedBallotsString);
 
         uploadPartialDecryption(share);
+        Intent intent = new Intent(DecryptActivity.this, MainActivity.class);
+        startActivity(intent);
 
     }
 
-    // TODO: Change this to upload a valid value of the share
+    // TODO: Verify this works
     private void uploadPartialDecryption(PartialDecryption share) throws IOException {
         // Set the URL where to POST the public key
         URL obj = new URL(partialDecryptionsServer);
@@ -104,7 +109,9 @@ public class DecryptActivity extends Activity {
         wr.close();
         con.getResponseCode();
 
-
+        Toast toast = Toast.makeText(this, "Ballots partially decrypted and uploaded successfully!", Toast.LENGTH_LONG);
+        toast.setGravity(Gravity.TOP, 25, 400);
+        toast.show();
     }
 
     private PartialDecryption decryptMultipliedBallots(String multipliedBallotsString) throws IOException, ClassNotFoundException {
@@ -119,21 +126,26 @@ public class DecryptActivity extends Activity {
     private PaillierThreshold getAuthorityPrivateKey() throws IOException, ClassNotFoundException {
         PaillierThreshold authPrivateKey = null;
 
-        // TODO: Change this path to the real one
-        String pathToPrivateKey = "privatekey.key";
-
         if (isExternalStorageReadable()) {
+            File authPrivateKeyDir = getApplicationContext().getDir("authPrivateKey", Context.MODE_PRIVATE);
+            File authPrivateKeyFile = new File(authPrivateKeyDir, "authPrivateKey.key");
 
-            BufferedReader privateKeyIn = new BufferedReader(new FileReader("p1File"));
-            String privateKeyRecoveredJson = privateKeyIn.readLine();
+            if(!authPrivateKeyFile.exists()){
+                //Quizás arrojar error que no existe el archivo
+            }
 
-            PrivateKey privateKey = new Gson().fromJson(privateKeyRecoveredJson, PrivateKey.class);
-            authPrivateKey = new PaillierThreshold(new PaillierPrivateThresholdKey(privateKey.n, Integer.parseInt(privateKey.l.toString()), Integer.parseInt(privateKey.w.toString()), privateKey.v, privateKey.vi, privateKey.si, Integer.parseInt(privateKey.i.toString()), new SecureRandom().nextLong()));
+            try {
+                BufferedReader privateKeyIn = new BufferedReader(new FileReader(authPrivateKeyFile));
+                String privateKeyRecoveredJson = privateKeyIn.readLine();
+                PrivateKey privateKey = new Gson().fromJson(privateKeyRecoveredJson, PrivateKey.class);
+                authPrivateKey = new PaillierThreshold(new PaillierPrivateThresholdKey(privateKey.n, Integer.parseInt(privateKey.l.toString()), Integer.parseInt(privateKey.w.toString()), privateKey.v, privateKey.vi, privateKey.si, Integer.parseInt(privateKey.i.toString()), new SecureRandom().nextLong()));
 
+            } catch (IOException e){
+                e.printStackTrace();
+            }
         }
 
-        return authPrivateKey;
-
+       return authPrivateKey;
     }
 
     /* Checks if external storage is available to at least read */

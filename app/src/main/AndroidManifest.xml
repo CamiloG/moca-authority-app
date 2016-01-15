@@ -3,6 +3,7 @@
     package="camilog.authorityapp" >
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -25,6 +26,11 @@
             android:name=".DecryptActivity"
             android:label="@string/title_activity_decrypt" >
         </activity>
+        <activity
+            android:name=".FileChooserActivity"
+            android:label="FileChooserActivity" >
+        </activity>
+
     </application>
 
 </manifest>
